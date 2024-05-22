@@ -1,0 +1,34 @@
+{
+	admin off
+	auto_https off
+	ocsp_stapling off
+	persist_config off
+
+	servers :8443 {
+		name https
+		protocols h1 h2
+	}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+
+	#order mercure after encode
+	#order vulcain after reverse_proxy
+	order php_server before file_server
+	order php before file_server
+}
+
+:8443 {
+	root * /app/public
+
+	skip_log *
+
+	encode zstd br gzip
+
+	tls /config/cert/tls.crt /config/cert/tls.key
+
+	php_server {
+		resolve_root_symlink
+	}
+}

@@ -1,0 +1,49 @@
+name: build images
+
+on:
+  push:
+    branches: [ "main" ]
+    tags-ignore: [ "*" ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  agma-server:
+    if: "!contains(github.event.commits[0].message, 'skip:agma-server')"
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    name: build base image for AGMA server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        name: login to ghcr.io
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./agma/server
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/agma:server
+
+  agma-vpn:
+    if: "!contains(github.event.commits[0].message, 'skip:agma-vpn')"
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    name: build image for openVPN
+    steps:
+    - uses: actions/checkout@v4
+    - uses: docker/login-action@v3
+      name: login to ghcr.io
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: docker/build-push-action@v5
+      with:
+        context: ./agma/vpn
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/agma:vpn
