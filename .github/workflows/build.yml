@@ -12,19 +12,19 @@ permissions:
 jobs:
   app-server:
     if: "!contains(github.event.commits[0].message, 'skip:app-server')"
-    timeout-minutes: 30
+    timeout-minutes: 15
     runs-on: ubuntu-latest
-    name: build base image for app server
+    name: build server image
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        name: login to ghcr.io
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v5
-        with:
-          context: ./app/server
-          push: true
-          tags: ghcr.io/ginafruit/app:server
+    - uses: actions/checkout@v4
+    - uses: docker/login-action@v3
+      name: login to ghcr.io
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: docker/build-push-action@v5
+      with:
+        context: ./app/server
+        push: true
+        tags: ghcr.io/GinaFruit/app:server

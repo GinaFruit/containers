@@ -4,31 +4,23 @@
 	ocsp_stapling off
 	persist_config off
 
-	servers :8443 {
-		name https
-		protocols h1 h2
-	}
-
-	frankenphp {
-		{$FRANKENPHP_CONFIG}
-	}
-
-	#order mercure after encode
-	#order vulcain after reverse_proxy
-	order php_server before file_server
-	order php before file_server
+	frankenphp
 }
 
-:8443 {
+:8080 {
+	handle /health-check {
+		@goingDown vars {http.shutting_down} true
+		respond @goingDown "going down in {http.time_until_shutdown}" 503
+		respond 200
+	}
+
 	root * /app/public
 
-	skip_log *
+	log_skip *
 
 	encode zstd br gzip
 
-	tls /config/cert/tls.crt /config/cert/tls.key
-
 	php_server {
-		resolve_root_symlink
+		resolve_root_symlink false
 	}
 }
