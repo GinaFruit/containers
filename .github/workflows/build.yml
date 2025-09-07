@@ -27,4 +27,4 @@ jobs:
       with:
         context: ./app/server
         push: true
-        tags: ghcr.io/GinaFruit/app:server
+        tags: ghcr.io/ginafruit/app:server
